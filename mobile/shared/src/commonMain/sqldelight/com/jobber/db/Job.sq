@@ -1,0 +1,74 @@
+CREATE TABLE Job (
+    id TEXT PRIMARY KEY NOT NULL,
+    jobNumber TEXT NOT NULL,
+    clientId TEXT NOT NULL,
+    quoteId TEXT,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    status TEXT NOT NULL,
+    priority TEXT NOT NULL,
+    scheduledAt INTEGER,
+    scheduledDuration INTEGER,
+    startedAt INTEGER,
+    completedAt INTEGER,
+    assignedToId TEXT,
+    instructions TEXT,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    syncStatus TEXT NOT NULL DEFAULT 'synced'
+);
+
+CREATE INDEX job_client_id ON Job(clientId);
+CREATE INDEX job_status ON Job(status);
+CREATE INDEX job_scheduled_at ON Job(scheduledAt);
+
+selectAll:
+SELECT * FROM Job;
+
+selectByDate:
+SELECT * FROM Job
+WHERE date(scheduledAt / 1000, 'unixepoch') = ?
+ORDER BY scheduledAt ASC;
+
+selectById:
+SELECT * FROM Job
+WHERE id = ?;
+
+selectByClientId:
+SELECT * FROM Job
+WHERE clientId = ?
+ORDER BY scheduledAt DESC;
+
+selectPendingSync:
+SELECT * FROM Job
+WHERE syncStatus = 'pending';
+
+insertOrReplace:
+INSERT OR REPLACE INTO Job(
+    id, jobNumber, clientId, quoteId, title, description,
+    status, priority, scheduledAt, scheduledDuration,
+    startedAt, completedAt, assignedToId, instructions,
+    createdAt, updatedAt, syncStatus
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateStatus:
+UPDATE Job
+SET status = ?, updatedAt = ?, syncStatus = 'pending'
+WHERE id = ?;
+
+markSynced:
+UPDATE Job
+SET syncStatus = 'synced'
+WHERE id = ?;
+
+markPendingSync:
+UPDATE Job
+SET syncStatus = 'pending'
+WHERE id = ?;
+
+delete:
+DELETE FROM Job
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM Job;

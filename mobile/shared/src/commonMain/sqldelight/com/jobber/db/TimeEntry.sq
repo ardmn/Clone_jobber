@@ -1,0 +1,70 @@
+CREATE TABLE TimeEntry (
+    id TEXT PRIMARY KEY NOT NULL,
+    jobId TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    startTime INTEGER NOT NULL,
+    endTime INTEGER,
+    breakDurationMinutes INTEGER,
+    latitude REAL,
+    longitude REAL,
+    notes TEXT,
+    status TEXT NOT NULL,
+    createdAt INTEGER NOT NULL,
+    syncStatus TEXT NOT NULL DEFAULT 'synced'
+);
+
+CREATE INDEX time_entry_job_id ON TimeEntry(jobId);
+CREATE INDEX time_entry_user_id ON TimeEntry(userId);
+CREATE INDEX time_entry_start_time ON TimeEntry(startTime);
+
+selectAll:
+SELECT * FROM TimeEntry
+ORDER BY startTime DESC;
+
+selectById:
+SELECT * FROM TimeEntry
+WHERE id = ?;
+
+selectByJobId:
+SELECT * FROM TimeEntry
+WHERE jobId = ?
+ORDER BY startTime DESC;
+
+selectByUserId:
+SELECT * FROM TimeEntry
+WHERE userId = ?
+ORDER BY startTime DESC;
+
+selectActive:
+SELECT * FROM TimeEntry
+WHERE endTime IS NULL
+ORDER BY startTime DESC
+LIMIT 1;
+
+selectPendingSync:
+SELECT * FROM TimeEntry
+WHERE syncStatus = 'pending';
+
+insertOrReplace:
+INSERT OR REPLACE INTO TimeEntry(
+    id, jobId, userId, startTime, endTime,
+    breakDurationMinutes, latitude, longitude,
+    notes, status, createdAt, syncStatus
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateEndTime:
+UPDATE TimeEntry
+SET endTime = ?, latitude = ?, longitude = ?, syncStatus = 'pending'
+WHERE id = ?;
+
+markSynced:
+UPDATE TimeEntry
+SET syncStatus = 'synced'
+WHERE id = ?;
+
+delete:
+DELETE FROM TimeEntry
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM TimeEntry;
