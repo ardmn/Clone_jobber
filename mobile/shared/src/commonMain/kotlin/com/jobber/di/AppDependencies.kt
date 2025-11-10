@@ -3,9 +3,11 @@ package com.jobber.di
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.jobber.data.repository.JobRepositoryImpl
+import com.jobber.data.repository.TimeTrackingRepositoryImpl
 import com.jobber.database.DatabaseDriverFactory
 import com.jobber.db.JobberDatabase
 import com.jobber.domain.repositories.JobRepository
+import com.jobber.domain.repositories.TimeTrackingRepository
 import com.jobber.domain.usecases.ClockInUseCase
 import com.jobber.domain.usecases.ClockOutUseCase
 import com.jobber.domain.usecases.CompleteJobUseCase
@@ -34,18 +36,13 @@ class AppDependencies(
 
     // Repositories
     val jobRepository: JobRepository = JobRepositoryImpl(jobApi, database)
+    val timeTrackingRepository: TimeTrackingRepository = TimeTrackingRepositoryImpl(timeTrackingApi, database)
 
     // Use Cases
     val getScheduleUseCase = GetScheduleUseCase(jobRepository)
     val completeJobUseCase = CompleteJobUseCase(jobRepository)
-    val clockInUseCase = ClockInUseCase(
-        // TODO: Add TimeTrackingRepository implementation
-        TODO("TimeTrackingRepository not implemented yet")
-    )
-    val clockOutUseCase = ClockOutUseCase(
-        // TODO: Add TimeTrackingRepository implementation
-        TODO("TimeTrackingRepository not implemented yet")
-    )
+    val clockInUseCase = ClockInUseCase(timeTrackingRepository)
+    val clockOutUseCase = ClockOutUseCase(timeTrackingRepository)
 
     // Stores
     private val storeFactory: StoreFactory = DefaultStoreFactory()
