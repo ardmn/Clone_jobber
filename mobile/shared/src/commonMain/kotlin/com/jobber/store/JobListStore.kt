@@ -35,7 +35,7 @@ interface JobListStore : Store<JobListStore.Intent, JobListStore.State, JobListS
     }
 }
 
-internal class JobListStoreFactory(
+class JobListStoreFactory(
     private val storeFactory: StoreFactory,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val completeJobUseCase: CompleteJobUseCase
