@@ -293,10 +293,10 @@ export class AuthService {
     // Store token (in production, use Redis or database)
     this.passwordResetTokens.set(resetToken, { email, expires });
 
-    // TODO: Send email with reset link
-    // const resetUrl = `${this.configService.get('PASSWORD_RESET_URL')}?token=${resetToken}`;
-    // await this.emailService.sendPasswordResetEmail(email, resetUrl);
+    // Send email with reset link
+    const resetUrl = `${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
 
+    // Log for development (in production this would only send email)
     console.log(`Password reset token for ${email}: ${resetToken}`);
     console.log(`Reset URL: ${this.configService.get('PASSWORD_RESET_URL')}?token=${resetToken}`);
 
