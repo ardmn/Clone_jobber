@@ -1,0 +1,54 @@
+CREATE TABLE Client (
+    id TEXT PRIMARY KEY NOT NULL,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    companyName TEXT,
+    email TEXT,
+    phone TEXT,
+    status TEXT NOT NULL,
+    tags TEXT NOT NULL DEFAULT '[]',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    syncStatus TEXT NOT NULL DEFAULT 'synced'
+);
+
+CREATE INDEX client_status ON Client(status);
+CREATE INDEX client_name ON Client(firstName, lastName);
+
+selectAll:
+SELECT * FROM Client
+ORDER BY lastName ASC, firstName ASC;
+
+selectById:
+SELECT * FROM Client
+WHERE id = ?;
+
+search:
+SELECT * FROM Client
+WHERE firstName LIKE '%' || ? || '%'
+   OR lastName LIKE '%' || ? || '%'
+   OR companyName LIKE '%' || ? || '%'
+   OR email LIKE '%' || ? || '%'
+ORDER BY lastName ASC, firstName ASC;
+
+selectPendingSync:
+SELECT * FROM Client
+WHERE syncStatus = 'pending';
+
+insertOrReplace:
+INSERT OR REPLACE INTO Client(
+    id, firstName, lastName, companyName, email,
+    phone, status, tags, createdAt, updatedAt, syncStatus
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+markSynced:
+UPDATE Client
+SET syncStatus = 'synced'
+WHERE id = ?;
+
+delete:
+DELETE FROM Client
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM Client;
